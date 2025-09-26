@@ -19,4 +19,7 @@ This project aims to build a website for authenticating student certificates. Th
 
 ## Getting Started
 
-Instructions for setup and usage will be added soon.
+- Install npm (if not installed) in your local pc
+- Then naviagte to the project folder
+- Run: npm install 
+- Create your respective branch, and do the respective changes in code (don't mess the main branch)
