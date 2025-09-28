@@ -1,10 +1,9 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
-import { apiResponse } from "../utils/ApiResponse.js";
-import { University } from "../models/university.model.js";
-import { generateOnlyAccessToken } from "../controllers/university.controller.js";
+import { apiResponse } from "../utils/apiResponse.js";
+import { Admin } from "../models/admin.model.js";
+import { generateOnlyAccessToken } from "../controllers/admin.controller.js";
 import jwt from "jsonwebtoken";
-
 
 
 export const refreshAccessToken= asyncHandler( async (req, res) => {
@@ -21,16 +20,16 @@ export const refreshAccessToken= asyncHandler( async (req, res) => {
         const decodedToken= jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET)
 
 
-        const university= await University.findById(decodedToken?._id)         // Here we are using ?. opearator beacause jaruri ni h ki hamare decoded token mei payloads (data) ho hi, it may be that refreshToken define krte waqt hmlog usme koi payloads na daale ho
+        const admin= await Admin.findById(decodedToken?._id)         // Here we are using ?. opearator beacause jaruri ni h ki hamare decoded token mei payloads (data) ho hi, it may be that refreshToken define krte waqt hmlog usme koi payloads na daale ho
 
-        if(!university)
+        if(!admin)
         {
             throw new apiError(401, "Invalid Refresh Token")
         }
 
 
 
-        if(incomingRefreshToken !== university.refreshToken)
+        if(incomingRefreshToken !== admin.refreshToken)
         {
             throw new apiError(401, "Refresh Token is either expired or used. Please login again")
         }
@@ -38,7 +37,7 @@ export const refreshAccessToken= asyncHandler( async (req, res) => {
 
 
 
-        const {accessToken}= await generateOnlyAccessToken(university._id)       // Yha pe Access Token ka naam should be same as you had given while returning values from the given function. Ni toh bahaut der phasoge
+        const {accessToken}= await generateOnlyAccessToken(admin._id)       // Yha pe Access Token ka naam should be same as you had given while returning values from the given function. Ni toh bahaut der phasoge
 
         const options= {
             httpOnly: true,

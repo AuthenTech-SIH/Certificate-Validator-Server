@@ -53,9 +53,9 @@ const generateAccessAndRefreshTokens= async (uniId) => {
 export const generateOnlyAccessToken= async (userId) => {
     try 
     {
-        const user= await User.findById(userId)
+        const user= await University.findById(userId)
+        
         const accessToken= user.generateAccessToken()
-
 
         return {accessToken}
     } 
