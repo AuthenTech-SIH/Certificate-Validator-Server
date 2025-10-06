@@ -4,19 +4,16 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";        // For strong the university secret key in encrypted form
 
 const universitySchema= new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
+    universityName: {
+        type: String
     },
-    universityAffiliationAndCode: [
+    universityAffiliationAndProof: [
         {
-            affiliation: {
-                type: String,
-                required: true
+            affiliationBody: {
+                type: String
             },
-            code: {
+            affiliationCode: {
                 type: String,
-                required: true,
                 unique: true
             },
             proofSupportingAffiliation: {       // Assuming there is only one proof to support this claim
@@ -24,9 +21,18 @@ const universitySchema= new mongoose.Schema({
             }
         }
     ],
+    institute_id: {
+        type: String,
+        unique: true,
+    },
+    year_of_establishment: {
+        type: Number
+    },
+    website: {
+        type: String
+    },
     type: {
         type: String,
-        required: true,
         enum: [
             "Government",
             "Private",
@@ -41,32 +47,50 @@ const universitySchema= new mongoose.Schema({
             "Deemed to be University"
         ]
     },
-    state: {
-        type: String,
-        required: true
+    numberOfStudents: {
+        type: Number
     },
-    district: {
-        type: String,
-        required: true
+    numberOfFaculties: {
+        type: Number
+    },
+    state: {
+        type: String
+    },
+    city: {
+        type: String
     },
     address: {
         type: String,
-        required: true,
         lowercase: true
     },
-    password: {
+    pincode: {
+        type: Number
+    },
+    officePhoneNumber: {
+        type: Number
+    },
+    universityEmail: {
         type: String,
-        required: true
+        lowercase: true
+    },
+    listOfCoursesOffered: {
+        type: [String]       // Array of strings
+    },
+    password: {
+        type: String
     },
     SPOC_name: {
         type: String,
         required: true
     },
-    SPOC_email: {
+    SPOC_designation: {
+        type: String
+    },
+    SPOC_email: {           
         type: String,
         required: true
     },
-    SPOC_contact: {
+    SPOC_contact: {         
         type: Number,
         required: true
     },
@@ -80,14 +104,15 @@ const universitySchema= new mongoose.Schema({
     },  
     status: {
         type: String,
-        enum: ["Pending", "Approved", "Rejected", "Called"],
-        default: "Pending"
+        enum: ["Pending", "Approved", "Rejected", "Called", "Incomplete"],
+        default: "Incomplete"
     },
     refreshToken: {
         type: String,
         default: null
     }
-})
+}, { timestamps: true });
+
 
 universitySchema.pre("save", async function(next) {
     if(this.isModified("password")){
@@ -112,6 +137,14 @@ universitySchema.pre("save", async function(next) {
 })
 
 
+universitySchema.methods.generateUniversitySecretKey= function(universityId) {
+    const randomPart = Math.random().toString(36).substring(2, 10); 
+    const timePart = Date.now().toString(36); 
+    const idPart = universityId.toString(24).slice(-4);
+
+    return `${randomPart}${timePart}${idPart}`;
+}
+
 universitySchema.methods.isPasswordCorrect= async function(password) {
     return await bcrypt.compare(password, this.password);
 }
@@ -129,7 +162,7 @@ universitySchema.methods.generateAccessToken = function () {
     const access_token= jwt.sign(       // Used to generate token
         {       
             _id: this._id,
-            name: this.name,
+            universityName: this.universityName,
             SPOC_name: this.SPOC_name,
             status: this.status
         },
@@ -147,7 +180,7 @@ universitySchema.methods.generateRefreshToken = function () {
     const refresh_token= jwt.sign(
         {
             _id: this._id,
-            name: this.name
+            universityName: this.universityName
         },
         process.env.REFRESH_TOKEN_SECRET,
         {
@@ -161,3 +194,11 @@ universitySchema.methods.generateRefreshToken = function () {
 
 
 export const University= mongoose.model("University", universitySchema);
+
+
+
+// Required fields in the model:
+// SPOC_email, SPOC_contact, institute_id, password, status, createdAt, updatedAt, refreshToken, type,
+// year_of_establishment, website, address, city, state, pincode, officePhoneNumber, universityEmail, 
+// SPOC_name, SPOC_designation, listOfCoursesOffered, totalNumberOfStudents, totalNumberOfFaculties,
+// { affilation details: need some changes in the frontend too }, university_secret_key, iv, universityName

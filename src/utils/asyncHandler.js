@@ -7,4 +7,4 @@ const asyncHandler= (func) => {
 }
 
 
-export {asyncHandler}
+export { asyncHandler }

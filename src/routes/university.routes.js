@@ -5,20 +5,20 @@ import * as universityController from "../controllers/university.controller.js";
 
 const router = Router();
 
-router.route("/register").post(upload.none(), universityController.registerUniversity);
+// Yha iss baar shyd upload.none() na lge. Check this out
+router.route("/SPOC-register").post(universityController.SPOCRegister);
 
-router.route("/login").post(upload.none(), universityController.loginUniversity);
+router.route("/SPOC-verify").post(universityController.SPOCVerify);
 
-router.route("/logout").post(verifyJWT, universityController.logoutUniversity);
+router.route("/create-password").post(universityController.createPassword);
 
-// yh route ek baar check krr lena ki isme verifyJWT and upload.none() cahiye ya ni
-router.route("/check-status").get(universityController.checkUniversityStatus)
+router.route("/check-status").get(universityController.checkStatus);
 
-router.route("/update").patch(verifyJWT, upload.none(), universityController.updateUniversity)
+router.route("/login").post(universityController.login);
 
-router.route("/delete-university").delete(verifyJWT, universityController.deleteUniversity)
+router.route("/logout").post(verifyJWT, universityController.logout);
 
-router.route("/upload-list-of-students-passing").post(verifyJWT, upload.single("file"), universityController.uploadListOfStudentsPassing);
+router.route("/complete-university-profile").post(verifyJWT, upload.any(), universityController.completeUniversityProfile);
 
 
 export default router;

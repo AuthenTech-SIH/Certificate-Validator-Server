@@ -1,5 +1,4 @@
-
-class ApiError extends Error        // Inheritance
+class apiError extends Error        // Inheritance
 {
     constructor(statusCode, message= "Something went wrong", errors= [], stack= "")
     {
@@ -21,4 +20,4 @@ class ApiError extends Error        // Inheritance
 }
 
 
-export {ApiError}
+export { apiError }
