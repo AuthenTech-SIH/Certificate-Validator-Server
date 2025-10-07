@@ -147,7 +147,7 @@ export const createPassword= asyncHandler(async (req, res) => {
 
     res.status(200)
        .clearCookie("universityID")
-       .json(new apiResponse(200, {}, "Password set successfully. You can now log in."));
+       .json(new apiResponse(200, {}, "Password set successfully."));
 })
 
 export const checkStatus = asyncHandler(async (req, res) => {
@@ -168,7 +168,7 @@ export const checkStatus = asyncHandler(async (req, res) => {
 
     
     res.status(200)
-       .json(new apiResponse(200, { status: university.status }, "University status fetched successfully."));
+       .json(new apiResponse(200, { status: university.status, loginID: university.institute_id, submissionDate:  university.createdAt }, "University status fetched successfully."));
 })
 
 export const login = asyncHandler(async (req, res) => {
