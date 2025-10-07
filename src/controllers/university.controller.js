@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { University } from "../models/university.model.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { apiError } from "../utils/apiError.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 
@@ -230,35 +231,33 @@ export const completeUniversityProfile= asyncHandler(async (req, res) => {
     } = req.body;
 
     const affiliationBodyCount = Object.keys(req.body).filter(key => key.startsWith("affiliationBody")).length;
-    const affiliationProofCount = Object.keys(req.body).filter(key => key.startsWith("affiliationProof")).length;
     const affiliationCodeCount = Object.keys(req.body).filter(key => key.startsWith("affiliationCode")).length;
-
+    const affiliationProofCount = req.files.filter(f => f.fieldname.startsWith("affiliationProof")).length;
+    console.log("\n\n", affiliationBodyCount, affiliationProofCount, affiliationCodeCount, "\n\n");
     if(affiliationBodyCount !== affiliationProofCount  ||  affiliationBodyCount !== affiliationCodeCount) {
         throw new apiError(400, "You must provide all of affiliation body names, their corresponding proofs and their unique codes for each entry.");
     }
 
-    for(i= 1; i<= affiliationBodyCount; i++)       
+    for(let i= 1; i<= affiliationBodyCount; i++)       
     {
         const bodyName= req.body[`affiliationBody${i}`];
         const bodyCode= req.body[`affiliationCode${i}`];
 
-        let proof= null;        
-        if(affiliationProofCount === 1)
-        {
-            proof= req.file[`affiliationProof${i}`].path;
-        }
-        else
-        {
-            proof= req.files[`affiliationProof${i}`][0].path;
-        }
+        const file = req.files.find(f => f.fieldname === `affiliationProof${i}`);
+        const proof = file ? file.path : null;
 
         if(!bodyName  ||  !proof  ||  !bodyCode) {
             throw new apiError(400, `All of affiliation body name, its proof and unique code are required for entry ${i}.`);
         }
 
+        const uploadedProof = await uploadOnCloudinary(proof);
+        if(!uploadedProof) {
+            throw new apiError(500, `Something went wrong while uploading the proof for entry ${i}. Please try again.`);
+        }
+
         university.universityAffiliationAndProof.push({
             affiliationBody: bodyName,
-            proofSupportingAffiliation: proof,
+            proofSupportingAffiliation: uploadedProof.url,
             affiliationCode: bodyCode
         });
     }

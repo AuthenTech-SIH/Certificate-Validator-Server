@@ -80,8 +80,7 @@ const universitySchema= new mongoose.Schema({
         type: String
     },
     SPOC_name: {
-        type: String,
-        required: true
+        type: String
     },
     SPOC_designation: {
         type: String
