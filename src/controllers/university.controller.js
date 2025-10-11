@@ -84,8 +84,8 @@ export const SPOCRegister= asyncHandler(async (req, res) => {
 
 
     // Return the token to the client
-    return res.status(200)
-              .cookie("SPOCRegisterToken", token, {httpOnly: true, secure: false})   // development k time isko false krr dena, production k time isko true krr dena. This is because development k time pe hamara url http hota h and not https, so agr isme secure: true krr denge toh yh hamare cookies ko allow ni karega
+    return res.status(200)                                      // check 'sameSite: "lax" ' ki yh hoga ki "none"
+              .cookie("SPOCRegisterToken", token, {httpOnly: true, secure: false, sameSite: "lax"})   // development k time isko false krr dena, production k time isko true krr dena. This is because development k time pe hamara url http hota h and not https, so agr isme secure: true krr denge toh yh hamare cookies ko allow ni karega
               .json(new apiResponse(200, { otp }, "OTP sent successfully. Check your email."));
 });
 
@@ -121,7 +121,7 @@ export const SPOCVerify= asyncHandler(async (req, res) => {
 
     res.status(200)
        .clearCookie("SPOCRegisterToken")
-       .cookie("universityID", universityID, {httpOnly: true, secure: false})   // development k time isko false krr dena, production k time isko true krr dena. This is because development k time pe hamara url http hota h and not https, so agr isme secure: true krr denge toh yh hamare cookies ko allow ni karega
+       .cookie("universityID", universityID, {httpOnly: true, secure: false, sameSite: "none"})   // development k time isko false krr dena, production k time isko true krr dena. This is because development k time pe hamara url http hota h and not https, so agr isme secure: true krr denge toh yh hamare cookies ko allow ni karega
        .json(new apiResponse(200, { universityID }, "OTP verified successfully."));
 })
 
@@ -193,8 +193,8 @@ export const login = asyncHandler(async (req, res) => {
     await university.save({ validateBeforeSave: false });
 
     res.status(200)
-       .cookie("accessToken", accessToken, { httpOnly: true, secure: false })   // development k time isko false krr dena, production k time isko true krr dena. This is because development k time pe hamara url http hota h and not https, so agr isme secure: true krr denge toh yh hamare cookies ko allow ni karega
-       .cookie("refreshToken", refreshToken, { httpOnly: true, secure: false }) 
+       .cookie("accessToken", accessToken, { httpOnly: true, secure: false, sameSite: "none" })   // development k time isko false krr dena, production k time isko true krr dena. This is because development k time pe hamara url http hota h and not https, so agr isme secure: true krr denge toh yh hamare cookies ko allow ni karega
+       .cookie("refreshToken", refreshToken, { httpOnly: true, secure: false, sameSite: "none" }) 
        .json(new apiResponse(200, { university, accessToken }, "Login successful."));
 })
 

@@ -7,7 +7,9 @@ const app = express();
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
-    credentials: true
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 
@@ -28,6 +30,18 @@ import universityRoutes from "./routes/university.routes.js";
 app.use("/api/university", refreshTokenRoutes);
 
 app.use("/api/university", universityRoutes);
+
+
+// Error-handling middleware (it will now throw the error in json format). 
+// This middleware should be at the end of all routes, ALWAYS.
+app.use((err, req, res, next) => {
+    res.status(err.statusCode || 500)
+       .json({  success: err.success || false,
+                message: err.message || "Internal Server Error",
+                errors: err.errors || [],
+                data: err.data || null
+            });
+});
 
 
 export default app;
