@@ -13,8 +13,7 @@ const universitySchema= new mongoose.Schema({
                 type: String
             },
             affiliationCode: {
-                type: String,
-                unique: true
+                type: String
             },
             proofSupportingAffiliation: {       // Assuming there is only one proof to support this claim
                 type: String        // cloudinary url

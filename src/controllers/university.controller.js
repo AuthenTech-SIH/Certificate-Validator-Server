@@ -83,9 +83,16 @@ export const SPOCRegister= asyncHandler(async (req, res) => {
     }
 
 
+    const options= {
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/"
+    }
+
     // Return the token to the client
-    return res.status(200)                                      // check 'sameSite: "lax" ' ki yh hoga ki "none"
-              .cookie("SPOCRegisterToken", token, {httpOnly: true, secure: false, sameSite: "lax"})   // development k time isko false krr dena, production k time isko true krr dena. This is because development k time pe hamara url http hota h and not https, so agr isme secure: true krr denge toh yh hamare cookies ko allow ni karega
+    return res.status(200)                                      
+              .cookie("SPOCRegisterToken", token, options)
               .json(new apiResponse(200, { otp }, "OTP sent successfully. Check your email."));
 });
 
@@ -119,9 +126,16 @@ export const SPOCVerify= asyncHandler(async (req, res) => {
     newUniversity.institute_id = universityID;
     await newUniversity.save({ validateBeforeSave: false });
 
+    const options= {
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/"
+    }
+
     res.status(200)
        .clearCookie("SPOCRegisterToken")
-       .cookie("universityID", universityID, {httpOnly: true, secure: false, sameSite: "none"})   // development k time isko false krr dena, production k time isko true krr dena. This is because development k time pe hamara url http hota h and not https, so agr isme secure: true krr denge toh yh hamare cookies ko allow ni karega
+       .cookie("universityID", universityID, options)
        .json(new apiResponse(200, { universityID }, "OTP verified successfully."));
 })
 
@@ -163,7 +177,7 @@ export const checkStatus = asyncHandler(async (req, res) => {
     }
 
     if(university.status === "Incomplete") {
-        throw new apiError(403, "Your registration is incomplete. Please complete your registration first.");
+        throw new apiError(403, "Your registration is incomplete. Please complete your registration first.", university);
     }
 
     
@@ -192,10 +206,24 @@ export const login = asyncHandler(async (req, res) => {
     university.refreshToken = refreshToken;
     await university.save({ validateBeforeSave: false });
 
-    res.status(200)
-       .cookie("accessToken", accessToken, { httpOnly: true, secure: false, sameSite: "none" })   // development k time isko false krr dena, production k time isko true krr dena. This is because development k time pe hamara url http hota h and not https, so agr isme secure: true krr denge toh yh hamare cookies ko allow ni karega
-       .cookie("refreshToken", refreshToken, { httpOnly: true, secure: false, sameSite: "none" }) 
-       .json(new apiResponse(200, { university, accessToken }, "Login successful."));
+
+
+    const isProduction = process.env.NODE_ENV === "production";
+                                
+    const cookieOptions = {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    path: "/"
+    };
+
+    return res.status(200)
+              .cookie("accessToken", accessToken, cookieOptions)
+              .cookie("refreshToken", refreshToken, {
+                ...cookieOptions,
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+              })
+              .json(new apiResponse(200, { university, accessToken }, "University logged in successfully"));
 })
 
 export const logout = asyncHandler(async (req, res) => {
