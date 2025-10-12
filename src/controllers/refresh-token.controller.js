@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { apiError } from "../utils/apiError.js";
-import { apiResponse } from "../utils/ApiResponse.js";
+import { apiResponse } from "../utils/apiResponse.js";
 import { University } from "../models/university.model.js";
 import { generateOnlyAccessToken } from "../controllers/university.controller.js";
 import jwt from "jsonwebtoken";

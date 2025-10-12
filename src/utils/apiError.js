@@ -1,11 +1,10 @@
-
-class ApiError extends Error        // Inheritance
+class apiError extends Error        // Inheritance
 {
-    constructor(statusCode, message= "Something went wrong", errors= [], stack= "")
+    constructor(statusCode, message= "Something went wrong", data, errors= [], stack= "")
     {
         super(message)          // Overriding the 'message' variable from our Error class
         this.statusCode= statusCode
-        this.data= null
+        this.data= data ||  null
         this.message= message      // You want to ensure it's explicitly set (even though super(message) already does it).
         this.success= false
         this.errors= errors
@@ -21,4 +20,4 @@ class ApiError extends Error        // Inheritance
 }
 
 
-export {ApiError}
+export { apiError }
