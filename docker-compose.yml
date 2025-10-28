@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  certificate-validator-ui:
+    build: ../Certificate-Validator-UI
+    ports:
+      - "80:80"
+    depends_on:
+    - certificate-validator-server
+    restart: unless-stopped
+  
+  certificate-validator-server:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+        # this will override the value of CORS_ORIGIN given in .env file
+      - CORS_ORIGIN=http://localhost
+    restart: unless-stopped
